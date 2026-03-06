@@ -24,7 +24,7 @@ let critChance = Number(localStorage.getItem(STORAGE_KEY + 'critChance')) || 0;
 let lastDaily = Number(localStorage.getItem(STORAGE_KEY + 'lastDaily')) || 0;
 let lastWheel = Number(localStorage.getItem(STORAGE_KEY + 'lastWheel')) || 0;
 
-// ===== ЗАДАНИЯ (ИСПРАВЛЕНЫ) =====
+// ===== ЗАДАНИЯ =====
 let quests = [
     { id: 0, name: '💰 Заработай 50 монет', reward: 20, progress: 0, target: 50, claimed: false },
     { id: 1, name: '💰 Заработай 100 монет', reward: 50, progress: 0, target: 100, claimed: false },
@@ -172,7 +172,7 @@ function updateUI() {
     localStorage.setItem(STORAGE_KEY + 'critChance', critChance);
 }
 
-// ===== ТАП =====
+// ===== ТАП (ИСПРАВЛЕННЫЙ) =====
 function handleTap() {
     if (energy <= 0) {
         showToast('⚡ Нет энергии');
@@ -197,7 +197,9 @@ function handleTap() {
     coins += reward;
     totalTaps++;
 
+    // ИСПРАВЛЕННАЯ СТРОКА
     tapCounter.innerText = '+' + reward.toFixed(2);
+
     tapCounter.style.animation = 'none';
     tapCounter.offsetHeight;
     tapCounter.style.animation = 'floatUp 0.8s ease-out';
@@ -268,34 +270,56 @@ function buyRegenUpgrade() {
     showToast('🔄 +1 энергии/сек');
 }
 
-// ===== ЗАДАНИЯ (ИСПРАВЛЕНЫ) =====
-// ===== ЗАДАНИЯ (ИСПРАВЛЕНЫ) =====
+// ===== ЗАДАНИЯ =====
+function updateQuests() {
+    if (!questsList) return;
+
+    let html = '';
+    quests.forEach(quest => {
+        let progressPercent = (quest.progress / quest.target * 100) + '%';
+
+        html += `
+            <div class="quest-card">
+                <div class="quest-icon">${quest.id < 3 ? '💰' : quest.id < 6 ? '👆' : '🔒'}</div>
+                <div class="quest-info">
+                    <div class="quest-name">${quest.name}</div>
+                    <div class="quest-progress">
+                        <div class="quest-progress-fill" style="width: ${progressPercent}"></div>
+                    </div>
+                    <div class="quest-reward">🎁 ${quest.reward} монет</div>
+                </div>
+                ${quest.progress >= quest.target && !quest.claimed ?
+                    '<button class="quest-btn" onclick="claimQuest(' + quest.id + ')">ЗАБРАТЬ</button>' :
+                    quest.claimed ? '<button class="quest-btn completed" disabled>✅ ВЫПОЛНЕНО</button>' :
+                    '<button class="quest-btn disabled" disabled>' + quest.progress + '/' + quest.target + '</button>'}
+            </div>
+        `;
+    });
+    questsList.innerHTML = html;
+}
+
 function checkQuests() {
     quests.forEach(quest => {
         if (!quest.claimed) {
             if (quest.id < 3) {
-                // Задания на монеты
                 if (coins >= quest.target) {
                     quest.progress = quest.target;
                 } else {
                     quest.progress = coins;
                 }
             } else if (quest.id < 6) {
-                // Задания на тапы
                 if (totalTaps >= quest.target) {
                     quest.progress = quest.target;
                 } else {
                     quest.progress = totalTaps;
                 }
             } else if (quest.id === 8) {
-                // Улучшение силы тапа
                 if (tapLevel >= quest.target) {
                     quest.progress = quest.target;
                 } else {
                     quest.progress = tapLevel;
                 }
             } else if (quest.id === 9) {
-                // Улучшение энергии
                 if (energyLevel >= quest.target) {
                     quest.progress = quest.target;
                 } else {
@@ -303,7 +327,6 @@ function checkQuests() {
                 }
             }
 
-            // Если прогресс достиг цели - задание выполнено
             if (quest.progress >= quest.target) {
                 quest.completed = true;
             }
@@ -314,6 +337,27 @@ function checkQuests() {
     updateQuests();
     updateQuestBadge();
 }
+
+function updateQuestBadge() {
+    let available = quests.filter(q => q.progress >= q.target && !q.claimed).length;
+    if (questBadge) {
+        questBadge.style.display = available > 0 ? 'flex' : 'none';
+        questBadge.innerText = available;
+    }
+}
+
+function claimQuest(id) {
+    let quest = quests.find(q => q.id === id);
+    if (!quest || quest.progress < quest.target || quest.claimed) return;
+
+    coins += quest.reward;
+    quest.claimed = true;
+
+    localStorage.setItem(STORAGE_KEY + 'quests', JSON.stringify(quests));
+    updateQuests();
+    updateQuestBadge();
+    updateUI();
+    showToast('🎁 +' + quest.reward + ' монет!');
 }
 
 // ===== ЕЖЕДНЕВНАЯ НАГРАДА =====
@@ -323,26 +367,26 @@ function updateTimers() {
 
     // Daily
     if (now - lastDaily > dayMs) {
-        dailyStatus.innerText = '🎁 Доступно!';
-        dailyBtn.classList.remove('disabled');
+        if (dailyStatus) dailyStatus.innerText = '🎁 Доступно!';
+        if (dailyBtn) dailyBtn.classList.remove('disabled');
     } else {
         let timeLeft = dayMs - (now - lastDaily);
         let hours = Math.floor(timeLeft / (60 * 60 * 1000));
         let minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
-        dailyTimer.innerText = `через ${hours}ч ${minutes}м`;
-        dailyBtn.classList.add('disabled');
+        if (dailyTimer) dailyTimer.innerText = `через ${hours}ч ${minutes}м`;
+        if (dailyBtn) dailyBtn.classList.add('disabled');
     }
 
     // Wheel
     if (now - lastWheel > dayMs) {
-        wheelStatus.innerText = '🎰 Доступно!';
-        wheelBtn.classList.remove('disabled');
+        if (wheelStatus) wheelStatus.innerText = '🎰 Доступно!';
+        if (wheelBtn) wheelBtn.classList.remove('disabled');
     } else {
         let timeLeft = dayMs - (now - lastWheel);
         let hours = Math.floor(timeLeft / (60 * 60 * 1000));
         let minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
-        wheelTimer.innerText = `через ${hours}ч ${minutes}м`;
-        wheelBtn.classList.add('disabled');
+        if (wheelTimer) wheelTimer.innerText = `через ${hours}ч ${minutes}м`;
+        if (wheelBtn) wheelBtn.classList.add('disabled');
     }
 }
 
@@ -355,7 +399,7 @@ function claimDailyReward() {
         return;
     }
 
-    let reward = 100 + Math.floor(Math.random() * 50);
+    let reward = 10 + Math.floor(Math.random() * 6);
     coins += reward;
     lastDaily = now;
     localStorage.setItem(STORAGE_KEY + 'lastDaily', lastDaily);
@@ -375,24 +419,50 @@ function spinWheel() {
     }
 
     wheel.classList.add('wheel-spinning');
+
+    let prizes = [
+        { value: 5, weight: 30 },
+        { value: 10, weight: 25 },
+        { value: 20, weight: 15 },
+        { value: 3, weight: 10 },
+        { value: 50, weight: 8 },
+        { value: 1, weight: 5 },
+        { value: 30, weight: 4 },
+        { value: 100, weight: 3 }
+    ];
+
+    let totalWeight = prizes.reduce((sum, p) => sum + p.weight, 0);
+    let random = Math.random() * totalWeight;
+    let cumulative = 0;
+    let selectedPrize = prizes[0].value;
+    let selectedIndex = 0;
+
+    for (let i = 0; i < prizes.length; i++) {
+        cumulative += prizes[i].weight;
+        if (random < cumulative) {
+            selectedPrize = prizes[i].value;
+            selectedIndex = i;
+            break;
+        }
+    }
+
     let spins = 5 + Math.floor(Math.random() * 5);
-    let degrees = spins * 360 + Math.floor(Math.random() * 360);
-    wheel.style.transform = `rotate(${degrees}deg)`;
+    let segmentAngle = 45;
+    let targetAngle = selectedIndex * segmentAngle + segmentAngle / 2;
+    let totalDegrees = spins * 360 + targetAngle;
+
+    wheel.style.transform = `rotate(${totalDegrees}deg)`;
 
     setTimeout(() => {
         wheel.classList.remove('wheel-spinning');
 
-        let prizes = [100, 50, 200, 30, 500, 10, 300, 1000];
-        let segment = Math.floor(((degrees % 360) / 45) + 0.5) % 8;
-        let reward = prizes[segment];
-
-        coins += reward;
+        coins += selectedPrize;
         lastWheel = now;
         localStorage.setItem(STORAGE_KEY + 'lastWheel', lastWheel);
 
         updateUI();
         updateTimers();
-        showToast('🎰 +' + reward + ' монет!');
+        showToast('🎰 +' + selectedPrize + ' монет!');
     }, 3000);
 }
 
