@@ -746,7 +746,213 @@ input:checked + .slider:before {
     opacity: 0;
     transition: 0.2s;
 }
+/* ===== УЛУЧШЕНИЯ ===== */
+.upgrade-section {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
 
+.upgrade-section h3 {
+    color: var(--primary);
+    margin-bottom: 12px;
+    font-size: 16px;
+}
+
+.upgrade-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.upgrade-item:active {
+    transform: scale(0.98);
+    background: rgba(0, 255, 136, 0.1);
+}
+
+.upgrade-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.upgrade-name {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.upgrade-level {
+    font-size: 12px;
+    color: var(--text-dim);
+}
+
+.upgrade-price {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 16px;
+}
+
+/* ===== МАГАЗИН ===== */
+.shop-section {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.shop-section h3 {
+    color: var(--primary);
+    margin-bottom: 16px;
+    font-size: 16px;
+}
+
+.daily-reward, .wheel-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.daily-info, .wheel-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.daily-info span:first-child, .wheel-info span:first-child {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.daily-info span:last-child, .wheel-info span:last-child {
+    font-size: 12px;
+    color: var(--text-dim);
+}
+
+.daily-btn, .wheel-btn {
+    background: var(--primary);
+    color: var(--bg-dark);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.daily-btn:active, .wheel-btn:active {
+    transform: scale(0.96);
+}
+
+.daily-btn.disabled, .wheel-btn.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* ===== КОЛЕСО УДАЧИ ===== */
+.wheel-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.wheel {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: conic-gradient(
+        #ff6b6b 0deg 45deg,
+        #4ecdc4 45deg 90deg,
+        #ffd166 90deg 135deg,
+        #6c5ce7 135deg 180deg,
+        #ff9f43 180deg 225deg,
+        #00d2d3 225deg 270deg,
+        #f368e0 270deg 315deg,
+        #5f27cd 315deg 360deg
+    );
+    border: 3px solid var(--border);
+    box-shadow: 0 0 20px var(--primary-glow);
+    transition: transform 3s cubic-bezier(0.25, 0.1, 0.15, 1);
+}
+
+.wheel-spinning {
+    transform: rotate(720deg);
+}
+
+.wheel-segment {
+    position: absolute;
+    width: 50%;
+    height: 2px;
+    left: 50%;
+    top: 50%;
+    transform-origin: left;
+    transform: rotate(calc(45deg * var(--i)));
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px black;
+}
+
+/* ===== ТАПАЛКА БОЛЬШЕ ===== */
+.clicker {
+    width: 240px;
+    height: 240px;
+}
+
+/* ===== VPN КАРТОЧКИ ===== */
+.vpn-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.vpn-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.vpn-card:active {
+    transform: scale(0.98);
+    background: rgba(0, 255, 136, 0.1);
+}
+
+.vpn-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.vpn-name {
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 4px;
+}
+
+.vpn-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+}
+
+.vpn-price {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary);
+}
 .toast.show {
     transform: translateX(-50%) translateY(0);
     opacity: 1;

@@ -36,9 +36,14 @@
                 <span class="menu-text">Задания</span>
                 <span class="menu-badge" id="questBadge">!</span>
             </div>
+            <div class="menu-item" onclick="showPage('upgrades')">
+                <span class="menu-icon">🚀</span>
+                <span class="menu-text">Улучшения</span>
+            </div>
             <div class="menu-item" onclick="showPage('shop')">
-                <span class="menu-icon">🛡️</span>
-                <span class="menu-text">Магазин VPN</span>
+                <span class="menu-icon">🎰</span>
+                <span class="menu-text">Магазин</span>
+                <span class="menu-badge" id="shopBadge">🎁</span>
             </div>
             <div class="menu-item" onclick="showPage('profile')">
                 <span class="menu-icon">👤</span>
@@ -53,7 +58,7 @@
     <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
 
     <div class="container">
-        <!-- Верхняя панель (только баланс) -->
+        <!-- Верхняя панель -->
         <div class="top-panel">
             <div class="hard-balance">
                 <span class="coin-icon">🪙</span>
@@ -61,7 +66,7 @@
             </div>
         </div>
 
-        <!-- Страницы -->
+        <!-- ГЛАВНАЯ -->
         <div class="page active" id="pageHome">
             <div class="stats-grid">
                 <div class="stat-block">
@@ -79,14 +84,14 @@
             <div class="energy-section">
                 <div class="energy-header">
                     <span>⚡ ЭНЕРГИЯ</span>
-                    <span id="energyCount">100/100</span>
+                    <span id="energyCount">300/300</span>
                 </div>
                 <div class="energy-bar">
                     <div class="energy-fill" id="energyFill" style="width:100%"></div>
                 </div>
             </div>
 
-            <div class="clicker-area">
+            <div class="clicker-wrapper">
                 <div class="clicker" onclick="handleTap()">
                     <div class="clicker-icon">⚡</div>
                 </div>
@@ -99,51 +104,123 @@
                     <span>Задания</span>
                 </button>
                 <button class="action-btn" onclick="showPage('shop')">
-                    <span>🛡️</span>
-                    <span>VPN</span>
-                </button>
-                <button class="action-btn" onclick="buyBooster('tap')">
-                    <span>🔥</span>
-                    <span>+0.01</span>
-                    <span class="price">600</span>
+                    <span>🎰</span>
+                    <span>Магазин</span>
                 </button>
             </div>
         </div>
 
-        <!-- Страница заданий -->
+        <!-- ЗАДАНИЯ -->
         <div class="page" id="pageQuests">
             <h2 class="page-title">📋 ЗАДАНИЯ</h2>
             <div class="quests-list" id="questsList"></div>
             <button class="back-btn" onclick="showPage('home')">← НАЗАД</button>
         </div>
 
-        <!-- Страница магазина VPN -->
-        <div class="page" id="pageShop">
-            <h2 class="page-title">🛡️ МАГАЗИН VPN</h2>
-            <div class="vpn-grid">
-                <div class="vpn-card" onclick="buyVPN('basic')">
-                    <div class="vpn-icon">🟢</div>
-                    <div class="vpn-name">БАЗОВЫЙ</div>
-                    <div class="vpn-desc">30 дней</div>
-                    <div class="vpn-price">1000 🪙</div>
+        <!-- УЛУЧШЕНИЯ -->
+        <div class="page" id="pageUpgrades">
+            <h2 class="page-title">🚀 УЛУЧШЕНИЯ</h2>
+
+            <div class="upgrade-section">
+                <h3>⚡ СИЛА ТАПА</h3>
+                <div class="upgrade-item" onclick="buyTapUpgrade()">
+                    <div class="upgrade-info">
+                        <span class="upgrade-name">+0.01 за тап</span>
+                        <span class="upgrade-level" id="tapLevel">Ур. 1</span>
+                    </div>
+                    <div class="upgrade-price" id="tapPrice">10 🪙</div>
                 </div>
-                <div class="vpn-card" onclick="buyVPN('pro')">
-                    <div class="vpn-icon">🔵</div>
-                    <div class="vpn-name">PRO</div>
-                    <div class="vpn-desc">90 дней</div>
-                    <div class="vpn-price">2500 🪙</div>
+            </div>
+
+            <div class="upgrade-section">
+                <h3>🔋 ЭНЕРГИЯ</h3>
+                <div class="upgrade-item" onclick="buyEnergyUpgrade()">
+                    <div class="upgrade-info">
+                        <span class="upgrade-name">+200 макс. энергии</span>
+                        <span class="upgrade-level" id="energyLevel">Ур. 1</span>
+                    </div>
+                    <div class="upgrade-price" id="energyPrice">15 🪙</div>
                 </div>
-                <div class="vpn-card" onclick="buyVPN('vip')">
-                    <div class="vpn-icon">💎</div>
-                    <div class="vpn-name">VIP</div>
-                    <div class="vpn-desc">365 дней</div>
-                    <div class="vpn-price">5000 🪙</div>
+            </div>
+
+            <div class="upgrade-section">
+                <h3>🔄 ВОССТАНОВЛЕНИЕ</h3>
+                <div class="upgrade-item" onclick="buyRegenUpgrade()">
+                    <div class="upgrade-info">
+                        <span class="upgrade-name">+1 энергии/сек</span>
+                        <span class="upgrade-level" id="regenLevel">Ур. 1</span>
+                    </div>
+                    <div class="upgrade-price" id="regenPrice">20 🪙</div>
                 </div>
             </div>
             <button class="back-btn" onclick="showPage('home')">← НАЗАД</button>
         </div>
 
-        <!-- Страница профиля -->
+        <!-- МАГАЗИН -->
+        <div class="page" id="pageShop">
+            <h2 class="page-title">🎰 МАГАЗИН</h2>
+
+            <div class="shop-section">
+                <h3>🎁 ЕЖЕДНЕВНАЯ НАГРАДА</h3>
+                <div class="daily-reward" id="dailyReward">
+                    <div class="daily-info">
+                        <span id="dailyStatus">Доступно!</span>
+                        <span id="dailyTimer"></span>
+                    </div>
+                    <button class="daily-btn" onclick="claimDailyReward()" id="dailyBtn">ЗАБРАТЬ</button>
+                </div>
+            </div>
+
+            <div class="shop-section">
+                <h3>🎰 КОЛЕСО УДАЧИ (24ч)</h3>
+                <div class="wheel-container">
+                    <div class="wheel" id="wheel">
+                        <div class="wheel-segment" style="--i:0">100</div>
+                        <div class="wheel-segment" style="--i:1">50</div>
+                        <div class="wheel-segment" style="--i:2">200</div>
+                        <div class="wheel-segment" style="--i:3">30</div>
+                        <div class="wheel-segment" style="--i:4">500</div>
+                        <div class="wheel-segment" style="--i:5">10</div>
+                        <div class="wheel-segment" style="--i:6">300</div>
+                        <div class="wheel-segment" style="--i:7">1000</div>
+                    </div>
+                </div>
+                <div class="wheel-controls">
+                    <div class="wheel-info">
+                        <span id="wheelStatus">Доступно!</span>
+                        <span id="wheelTimer"></span>
+                    </div>
+                    <button class="wheel-btn" onclick="spinWheel()" id="wheelBtn">КРУТИТЬ</button>
+                </div>
+            </div>
+
+            <div class="shop-section">
+                <h3>🛡️ VPN</h3>
+                <div class="vpn-grid">
+                    <div class="vpn-card" onclick="buyVPN('basic')">
+                        <div class="vpn-icon">🟢</div>
+                        <div class="vpn-name">БАЗОВЫЙ</div>
+                        <div class="vpn-desc">30 дней</div>
+                        <div class="vpn-price">200 🪙</div>
+                    </div>
+                    <div class="vpn-card" onclick="buyVPN('pro')">
+                        <div class="vpn-icon">🔵</div>
+                        <div class="vpn-name">PRO</div>
+                        <div class="vpn-desc">90 дней</div>
+                        <div class="vpn-price">500 🪙</div>
+                    </div>
+                    <div class="vpn-card" onclick="buyVPN('vip')">
+                        <div class="vpn-icon">💎</div>
+                        <div class="vpn-name">VIP</div>
+                        <div class="vpn-desc">365 дней</div>
+                        <div class="vpn-price">1000 🪙</div>
+                    </div>
+                </div>
+            </div>
+            <button class="back-btn" onclick="showPage('home')">← НАЗАД</button>
+        </div>
+
+        <!-- ПРОФИЛЬ -->
         <div class="page" id="pageProfile">
             <h2 class="page-title">👤 ПРОФИЛЬ</h2>
             <div class="profile-card">
@@ -167,12 +244,12 @@
                         <span id="profilePower">0.01</span>
                     </div>
                 </div>
-                <button class="profile-btn" onclick="showNicknameModal()">✏️ СМЕНИТЬ НИК (500)</button>
+                <button class="profile-btn" onclick="showNicknameModal()">✏️ СМЕНИТЬ НИК (100)</button>
             </div>
             <button class="back-btn" onclick="showPage('home')">← НАЗАД</button>
         </div>
 
-        <!-- Страница настроек -->
+        <!-- НАСТРОЙКИ -->
         <div class="page" id="pageSettings">
             <h2 class="page-title">⚙️ НАСТРОЙКИ</h2>
             <div class="settings-group">
@@ -184,13 +261,6 @@
                     <span>🔊 Звук тапов</span>
                     <label class="switch">
                         <input type="checkbox" id="soundTap" checked onchange="saveSetting('soundTap', this.checked)">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <span>🔊 Звук покупок</span>
-                    <label class="switch">
-                        <input type="checkbox" id="soundBuy" checked onchange="saveSetting('soundBuy', this.checked)">
                         <span class="slider"></span>
                     </label>
                 </div>
@@ -210,21 +280,12 @@
     <div class="modal" id="nicknameModal">
         <div class="modal-content">
             <h3>✏️ СМЕНИТЬ НИК</h3>
-            <p class="modal-price">Стоимость: 500 🪙</p>
+            <p class="modal-price">Стоимость: 100 🪙</p>
             <input type="text" class="modal-input" id="nicknameInput" placeholder="Новый ник" maxlength="20">
             <div class="modal-buttons">
                 <button class="modal-btn" onclick="changeNickname()">Изменить</button>
                 <button class="modal-btn modal-btn-secondary" onclick="closeModal()">Отмена</button>
             </div>
-        </div>
-    </div>
-
-    <!-- Модалка награды -->
-    <div class="modal" id="rewardModal">
-        <div class="modal-content">
-            <h3>🎁 НАГРАДА</h3>
-            <p id="rewardText">Вы получили награду!</p>
-            <button class="modal-btn" onclick="closeRewardModal()">Ок</button>
         </div>
     </div>
 
