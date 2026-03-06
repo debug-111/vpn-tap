@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>⚡ VPN TAP</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+    <div class="menu-toggle" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="side-menu" id="sideMenu">
+        <div class="menu-header">
+            <span class="menu-logo">⚡ VPN TAP</span>
+            <button class="menu-close" onclick="toggleMenu()">✕</button>
+        </div>
+        <div class="menu-profile" onclick="showPage('profile')">
+            <div class="menu-avatar" id="menuAvatar">⚡</div>
+            <div class="menu-info">
+                <div class="menu-name" id="menuNickname">Загрузка...</div>
+            </div>
+        </div>
+        <div class="menu-items">
+            <div class="menu-item" onclick="showPage('home')">
+                <span class="menu-icon">⚡</span>
+                <span class="menu-text">Главная</span>
+            </div>
+            <div class="menu-item" onclick="showPage('quests')">
+                <span class="menu-icon">📋</span>
+                <span class="menu-text">Задания</span>
+                <span class="menu-badge" id="questBadge">!</span>
+            </div>
+            <div class="menu-item" onclick="showPage('shop')">
+                <span class="menu-icon">🛡️</span>
+                <span class="menu-text">Магазин VPN</span>
+            </div>
+            <div class="menu-item" onclick="showPage('profile')">
+                <span class="menu-icon">👤</span>
+                <span class="menu-text">Профиль</span>
+            </div>
+            <div class="menu-item" onclick="showPage('settings')">
+                <span class="menu-icon">⚙️</span>
+                <span class="menu-text">Настройки</span>
+            </div>
+        </div>
+    </div>
+    <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+
+    <div class="container">
+        <!-- Верхняя панель (только баланс) -->
+        <div class="top-panel">
+            <div class="hard-balance">
+                <span class="coin-icon">🪙</span>
+                <span class="balance-amount" id="coinBalance">0.00</span>
+            </div>
+        </div>
+
+        <!-- Страницы -->
+        <div class="page active" id="pageHome">
+            <div class="stats-grid">
+                <div class="stat-block">
+                    <span class="stat-icon">⚡</span>
+                    <span class="stat-value" id="tapPower">0.01</span>
+                    <span class="stat-label">за тап</span>
+                </div>
+                <div class="stat-block">
+                    <span class="stat-icon">📊</span>
+                    <span class="stat-value" id="totalTaps">0</span>
+                    <span class="stat-label">тапов</span>
+                </div>
+            </div>
+
+            <div class="energy-section">
+                <div class="energy-header">
+                    <span>⚡ ЭНЕРГИЯ</span>
+                    <span id="energyCount">100/100</span>
+                </div>
+                <div class="energy-bar">
+                    <div class="energy-fill" id="energyFill" style="width:100%"></div>
+                </div>
+            </div>
+
+            <div class="clicker-area">
+                <div class="clicker" onclick="handleTap()">
+                    <div class="clicker-icon">⚡</div>
+                </div>
+                <div class="tap-counter" id="tapCounter">+0.01</div>
+            </div>
+
+            <div class="quick-actions">
+                <button class="action-btn" onclick="showPage('quests')">
+                    <span>📋</span>
+                    <span>Задания</span>
+                </button>
+                <button class="action-btn" onclick="showPage('shop')">
+                    <span>🛡️</span>
+                    <span>VPN</span>
+                </button>
+                <button class="action-btn" onclick="buyBooster('tap')">
+                    <span>🔥</span>
+                    <span>+0.01</span>
+                    <span class="price">600</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Страница заданий -->
+        <div class="page" id="pageQuests">
+            <h2 class="page-title">📋 ЗАДАНИЯ</h2>
+            <div class="quests-list" id="questsList"></div>
+            <button class="back-btn" onclick="showPage('home')">← НАЗАД</button>
+        </div>
+
+        <!-- Страница магазина VPN -->
+        <div class="page" id="pageShop">
+            <h2 class="page-title">🛡️ МАГАЗИН VPN</h2>
+            <div class="vpn-grid">
+                <div class="vpn-card" onclick="buyVPN('basic')">
+                    <div class="vpn-icon">🟢</div>
+                    <div class="vpn-name">БАЗОВЫЙ</div>
+                    <div class="vpn-desc">30 дней</div>
+                    <div class="vpn-price">1000 🪙</div>
+                </div>
+                <div class="vpn-card" onclick="buyVPN('pro')">
+                    <div class="vpn-icon">🔵</div>
+                    <div class="vpn-name">PRO</div>
+                    <div class="vpn-desc">90 дней</div>
+                    <div class="vpn-price">2500 🪙</div>
+                </div>
+                <div class="vpn-card" onclick="buyVPN('vip')">
+                    <div class="vpn-icon">💎</div>
+                    <div class="vpn-name">VIP</div>
+                    <div class="vpn-desc">365 дней</div>
+                    <div class="vpn-price">5000 🪙</div>
+                </div>
+            </div>
+            <button class="back-btn" onclick="showPage('home')">← НАЗАД</button>
+        </div>
+
+        <!-- Страница профиля -->
+        <div class="page" id="pageProfile">
+            <h2 class="page-title">👤 ПРОФИЛЬ</h2>
+            <div class="profile-card">
+                <div class="profile-avatar" id="profileAvatar">⚡</div>
+                <div class="profile-name" id="profileNickname">-</div>
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <span>ID</span>
+                        <span id="profileId">-</span>
+                    </div>
+                    <div class="profile-stat">
+                        <span>Монет</span>
+                        <span id="profileCoins">0</span>
+                    </div>
+                    <div class="profile-stat">
+                        <span>Тапов</span>
+                        <span id="profileTaps">0</span>
+                    </div>
+                    <div class="profile-stat">
+                        <span>Сила</span>
+                        <span id="profilePower">0.01</span>
+                    </div>
+                </div>
+                <button class="profile-btn" onclick="showNicknameModal()">✏️ СМЕНИТЬ НИК (500)</button>
+            </div>
+            <button class="back-btn" onclick="showPage('home')">← НАЗАД</button>
+        </div>
+
+        <!-- Страница настроек -->
+        <div class="page" id="pageSettings">
+            <h2 class="page-title">⚙️ НАСТРОЙКИ</h2>
+            <div class="settings-group">
+                <div class="setting-item">
+                    <span>🌓 Тема</span>
+                    <button class="theme-btn" onclick="toggleTheme()" id="themeToggle">☀️ Светлая</button>
+                </div>
+                <div class="setting-item">
+                    <span>🔊 Звук тапов</span>
+                    <label class="switch">
+                        <input type="checkbox" id="soundTap" checked onchange="saveSetting('soundTap', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <span>🔊 Звук покупок</span>
+                    <label class="switch">
+                        <input type="checkbox" id="soundBuy" checked onchange="saveSetting('soundBuy', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <span>📳 Вибрация</span>
+                    <label class="switch">
+                        <input type="checkbox" id="vibration" checked onchange="saveSetting('vibration', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            <button class="back-btn" onclick="showPage('home')">← НАЗАД</button>
+        </div>
+    </div>
+
+    <!-- Модалка смены ника -->
+    <div class="modal" id="nicknameModal">
+        <div class="modal-content">
+            <h3>✏️ СМЕНИТЬ НИК</h3>
+            <p class="modal-price">Стоимость: 500 🪙</p>
+            <input type="text" class="modal-input" id="nicknameInput" placeholder="Новый ник" maxlength="20">
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="changeNickname()">Изменить</button>
+                <button class="modal-btn modal-btn-secondary" onclick="closeModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модалка награды -->
+    <div class="modal" id="rewardModal">
+        <div class="modal-content">
+            <h3>🎁 НАГРАДА</h3>
+            <p id="rewardText">Вы получили награду!</p>
+            <button class="modal-btn" onclick="closeRewardModal()">Ок</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <script src="script.js"></script>
+</body>
+</html>
