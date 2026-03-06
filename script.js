@@ -269,65 +269,51 @@ function buyRegenUpgrade() {
 }
 
 // ===== ЗАДАНИЯ (ИСПРАВЛЕНЫ) =====
-function updateQuests() {
-    if (!questsList) return;
-
-    let html = '';
-    quests.forEach(quest => {
-        let progressPercent = (quest.progress / quest.target * 100) + '%';
-
-        html += `
-            <div class="quest-card">
-                <div class="quest-icon">${quest.id < 3 ? '💰' : quest.id < 6 ? '👆' : '🔒'}</div>
-                <div class="quest-info">
-                    <div class="quest-name">${quest.name}</div>
-                    <div class="quest-progress">
-                        <div class="quest-progress-fill" style="width: ${progressPercent}"></div>
-                    </div>
-                    <div class="quest-reward">🎁 ${quest.reward} монет</div>
-                </div>
-                ${quest.progress >= quest.target && !quest.claimed ?
-                    '<button class="quest-btn" onclick="claimQuest(' + quest.id + ')">ЗАБРАТЬ</button>' :
-                    quest.claimed ? '<button class="quest-btn completed" disabled>✅ ВЫПОЛНЕНО</button>' :
-                    '<button class="quest-btn disabled" disabled>' + quest.progress + '/' + quest.target + '</button>'}
-            </div>
-        `;
-    });
-    questsList.innerHTML = html;
-}
-
+// ===== ЗАДАНИЯ (ИСПРАВЛЕНЫ) =====
 function checkQuests() {
     quests.forEach(quest => {
         if (!quest.claimed) {
-            if (quest.id < 3) quest.progress = Math.min(coins, quest.target);
-            else if (quest.id < 6) quest.progress = Math.min(totalTaps, quest.target);
+            if (quest.id < 3) {
+                // Задания на монеты
+                if (coins >= quest.target) {
+                    quest.progress = quest.target;
+                } else {
+                    quest.progress = coins;
+                }
+            } else if (quest.id < 6) {
+                // Задания на тапы
+                if (totalTaps >= quest.target) {
+                    quest.progress = quest.target;
+                } else {
+                    quest.progress = totalTaps;
+                }
+            } else if (quest.id === 8) {
+                // Улучшение силы тапа
+                if (tapLevel >= quest.target) {
+                    quest.progress = quest.target;
+                } else {
+                    quest.progress = tapLevel;
+                }
+            } else if (quest.id === 9) {
+                // Улучшение энергии
+                if (energyLevel >= quest.target) {
+                    quest.progress = quest.target;
+                } else {
+                    quest.progress = energyLevel;
+                }
+            }
+
+            // Если прогресс достиг цели - задание выполнено
+            if (quest.progress >= quest.target) {
+                quest.completed = true;
+            }
         }
     });
-    localStorage.setItem(STORAGE_KEY + 'quests', JSON.stringify(quests));
-    updateQuests();
-    updateQuestBadge();
-}
-
-function updateQuestBadge() {
-    let available = quests.filter(q => q.progress >= q.target && !q.claimed).length;
-    if (questBadge) {
-        questBadge.style.display = available > 0 ? 'flex' : 'none';
-        questBadge.innerText = available;
-    }
-}
-
-function claimQuest(id) {
-    let quest = quests.find(q => q.id === id);
-    if (!quest || quest.progress < quest.target || quest.claimed) return;
-
-    coins += quest.reward;
-    quest.claimed = true;
 
     localStorage.setItem(STORAGE_KEY + 'quests', JSON.stringify(quests));
     updateQuests();
     updateQuestBadge();
-    updateUI();
-    showToast('🎁 +' + quest.reward + ' монет!');
+}
 }
 
 // ===== ЕЖЕДНЕВНАЯ НАГРАДА =====
