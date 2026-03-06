@@ -75,6 +75,10 @@ const toast = document.getElementById('toast');
 const sideMenu = document.getElementById('sideMenu');
 const menuOverlay = document.getElementById('menuOverlay');
 const nicknameModal = document.getElementById('nicknameModal');
+const headerNickname = document.getElementById('headerNickname');
+const headerAvatar = document.getElementById('headerAvatar');
+const wheelPreviewBtn = document.getElementById('wheelPreviewBtn');
+const wheelTimerPreview = document.getElementById('wheelTimerPreview');
 
 // Элементы улучшений
 const tapLevelEl = document.getElementById('tapLevel');
@@ -143,6 +147,13 @@ function init() {
     updateTimers();
     setInterval(regenEnergy, 1000);
     setInterval(updateTimers, 1000);
+
+    // Показать модалку ника при первом входе
+    if (!localStorage.getItem(STORAGE_KEY + 'nickname')) {
+        setTimeout(() => {
+            showFirstNicknameModal();
+        }, 500);
+    }
 }
 
 // ===== ОБНОВЛЕНИЕ UI =====
@@ -163,6 +174,10 @@ function updateUI() {
     profileTaps.innerText = totalTaps;
     profilePower.innerText = (tapPower * 0.01).toFixed(2);
 
+    // Обновление ника в шапке
+    if (headerNickname) headerNickname.innerText = nickname;
+    if (headerAvatar) headerAvatar.innerText = avatarChar;
+
     localStorage.setItem(STORAGE_KEY + 'coins', coins);
     localStorage.setItem(STORAGE_KEY + 'tapPower', tapPower);
     localStorage.setItem(STORAGE_KEY + 'totalTaps', totalTaps);
@@ -172,7 +187,7 @@ function updateUI() {
     localStorage.setItem(STORAGE_KEY + 'critChance', critChance);
 }
 
-// ===== ТАП (ИСПРАВЛЕННЫЙ) =====
+// ===== ТАП =====
 function handleTap() {
     if (energy <= 0) {
         showToast('⚡ Нет энергии');
@@ -197,9 +212,7 @@ function handleTap() {
     coins += reward;
     totalTaps++;
 
-    // ИСПРАВЛЕННАЯ СТРОКА
     tapCounter.innerText = '+' + reward.toFixed(2);
-
     tapCounter.style.animation = 'none';
     tapCounter.offsetHeight;
     tapCounter.style.animation = 'floatUp 0.8s ease-out';
@@ -381,12 +394,14 @@ function updateTimers() {
     if (now - lastWheel > dayMs) {
         if (wheelStatus) wheelStatus.innerText = '🎰 Доступно!';
         if (wheelBtn) wheelBtn.classList.remove('disabled');
+        if (wheelTimerPreview) wheelTimerPreview.innerText = 'Готово!';
     } else {
         let timeLeft = dayMs - (now - lastWheel);
         let hours = Math.floor(timeLeft / (60 * 60 * 1000));
         let minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
         if (wheelTimer) wheelTimer.innerText = `через ${hours}ч ${minutes}м`;
         if (wheelBtn) wheelBtn.classList.add('disabled');
+        if (wheelTimerPreview) wheelTimerPreview.innerText = `${hours}ч ${minutes}м`;
     }
 }
 
@@ -506,6 +521,10 @@ function regenEnergy() {
 }
 
 // ===== НИКНЕЙМ =====
+function showFirstNicknameModal() {
+    nicknameModal.classList.add('active');
+}
+
 function showNicknameModal() {
     if (coins < 100) {
         showToast('❌ Нужно 100 монет');
@@ -526,7 +545,11 @@ function changeNickname() {
         return;
     }
 
-    coins -= 100;
+    // Если это не первый вход (есть старый ник) - списываем монеты
+    if (localStorage.getItem(STORAGE_KEY + 'nickname')) {
+        coins -= 100;
+    }
+
     nickname = newNick;
     localStorage.setItem(STORAGE_KEY + 'nickname', nickname);
     updateUI();

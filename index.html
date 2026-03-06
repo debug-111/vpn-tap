@@ -9,6 +9,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="dark-theme">
+    <!-- Ник в правом верхнем углу -->
+    <div class="nickname-display" onclick="showPage('profile')">
+        <span class="nickname-avatar" id="headerAvatar">⚡</span>
+        <span class="nickname-text" id="headerNickname">Загрузка...</span>
+    </div>
+
     <div class="menu-toggle" onclick="toggleMenu()">
         <span></span>
         <span></span>
@@ -58,7 +64,7 @@
     <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
 
     <div class="container">
-        <!-- Верхняя панель -->
+        <!-- Верхняя панель (только баланс) -->
         <div class="top-panel">
             <div class="hard-balance">
                 <span class="coin-icon">🪙</span>
@@ -167,30 +173,19 @@
                         <span id="dailyStatus">Доступно!</span>
                         <span id="dailyTimer"></span>
                     </div>
-                    <button class="daily-btn" onclick="claimDailyReward()" id="dailyBtn">ЗАБРАТЬ</button>
+                    <button class="daily-btn" onclick="claimDailyReward()" id="dailyBtn">ЗАБРАТЬ 10-15</button>
                 </div>
             </div>
 
             <div class="shop-section">
-                <h3>🎰 КОЛЕСО УДАЧИ (24ч)</h3>
-                <div class="wheel-container">
-                    <div class="wheel" id="wheel">
-                        <div class="wheel-segment" style="--i:0">100</div>
-                        <div class="wheel-segment" style="--i:1">50</div>
-                        <div class="wheel-segment" style="--i:2">200</div>
-                        <div class="wheel-segment" style="--i:3">30</div>
-                        <div class="wheel-segment" style="--i:4">500</div>
-                        <div class="wheel-segment" style="--i:5">10</div>
-                        <div class="wheel-segment" style="--i:6">300</div>
-                        <div class="wheel-segment" style="--i:7">1000</div>
+                <h3>🎰 КОЛЕСО УДАЧИ</h3>
+                <div class="wheel-preview" onclick="showPage('wheel')">
+                    <div class="wheel-preview-icon">🎰</div>
+                    <div class="wheel-preview-info">
+                        <span>Крутить колесо</span>
+                        <span class="wheel-timer" id="wheelTimerPreview"></span>
                     </div>
-                </div>
-                <div class="wheel-controls">
-                    <div class="wheel-info">
-                        <span id="wheelStatus">Доступно!</span>
-                        <span id="wheelTimer"></span>
-                    </div>
-                    <button class="wheel-btn" onclick="spinWheel()" id="wheelBtn">КРУТИТЬ</button>
+                    <button class="wheel-preview-btn" id="wheelPreviewBtn">24ч</button>
                 </div>
             </div>
 
@@ -218,6 +213,49 @@
                 </div>
             </div>
             <button class="back-btn" onclick="showPage('home')">← НАЗАД</button>
+        </div>
+
+        <!-- СТРАНИЦА КОЛЕСА УДАЧИ -->
+        <div class="page" id="pageWheel">
+            <h2 class="page-title">🎰 КОЛЕСО УДАЧИ</h2>
+
+            <div class="wheel-page">
+                <div class="wheel-container">
+                    <div class="wheel" id="wheel">
+                        <div class="wheel-segment" style="--i:0">5</div>
+                        <div class="wheel-segment" style="--i:1">10</div>
+                        <div class="wheel-segment" style="--i:2">20</div>
+                        <div class="wheel-segment" style="--i:3">3</div>
+                        <div class="wheel-segment" style="--i:4">50</div>
+                        <div class="wheel-segment" style="--i:5">1</div>
+                        <div class="wheel-segment" style="--i:6">30</div>
+                        <div class="wheel-segment" style="--i:7">100</div>
+                    </div>
+                </div>
+
+                <div class="wheel-prizes">
+                    <h3>🏆 ВОЗМОЖНЫЕ ВЫИГРЫШИ:</h3>
+                    <div class="prizes-grid">
+                        <div class="prize-item" style="background: #ff6b6b">5 🪙 (30%)</div>
+                        <div class="prize-item" style="background: #4ecdc4">10 🪙 (25%)</div>
+                        <div class="prize-item" style="background: #ffd166">20 🪙 (15%)</div>
+                        <div class="prize-item" style="background: #6c5ce7">3 🪙 (10%)</div>
+                        <div class="prize-item" style="background: #ff9f43">50 🪙 (8%)</div>
+                        <div class="prize-item" style="background: #00d2d3">1 🪙 (5%)</div>
+                        <div class="prize-item" style="background: #f368e0">30 🪙 (4%)</div>
+                        <div class="prize-item" style="background: #5f27cd">100 🪙 (3%)</div>
+                    </div>
+                </div>
+
+                <div class="wheel-controls">
+                    <div class="wheel-info">
+                        <span id="wheelStatus">Доступно!</span>
+                        <span id="wheelTimer"></span>
+                    </div>
+                    <button class="wheel-btn" onclick="spinWheel()" id="wheelBtn">КРУТИТЬ</button>
+                </div>
+            </div>
+            <button class="back-btn" onclick="showPage('shop')">← В МАГАЗИН</button>
         </div>
 
         <!-- ПРОФИЛЬ -->
