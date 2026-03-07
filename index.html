@@ -51,6 +51,11 @@
                 <span class="menu-text">Магазин</span>
                 <span class="menu-badge" id="shopBadge">🎁</span>
             </div>
+            <div class="menu-item" onclick="showPage('referrals')">
+                <span class="menu-icon">👥</span>
+                <span class="menu-text">Друзья</span>
+                <span class="menu-badge" id="friendsBadge">0</span>
+            </div>
             <div class="menu-item" onclick="showPage('profile')">
                 <span class="menu-icon">👤</span>
                 <span class="menu-text">Профиль</span>
@@ -256,6 +261,44 @@
                 </div>
             </div>
             <button class="back-btn" onclick="showPage('shop')">← В МАГАЗИН</button>
+        </div>
+
+        <!-- СТРАНИЦА РЕФЕРАЛОВ -->
+        <div class="page" id="pageReferrals">
+            <h2 class="page-title">👥 ДРУЗЬЯ</h2>
+
+            <div class="referrals-stats">
+                <div class="referral-stat-card">
+                    <span class="stat-icon">👥</span>
+                    <span class="stat-value" id="referralCount">0</span>
+                    <span class="stat-label">приглашено</span>
+                </div>
+                <div class="referral-stat-card">
+                    <span class="stat-icon">🪙</span>
+                    <span class="stat-value" id="referralBonus">0</span>
+                    <span class="stat-label">бонусов</span>
+                </div>
+            </div>
+
+            <div class="referral-section">
+                <h3>🔗 ТВОЯ ССЫЛКА</h3>
+                <div class="referral-link-box">
+                    <input type="text" class="referral-link-input" id="referralLink" readonly>
+                    <button class="referral-copy-btn" onclick="copyReferralLink()">📋</button>
+                </div>
+                <p class="referral-hint">За каждого друга ты получаешь <strong>50 монет</strong>!</p>
+            </div>
+
+            <div class="referral-section">
+                <h3>📋 ПРИГЛАШЕННЫЕ ДРУЗЬЯ</h3>
+                <div class="friends-list" id="friendsList"></div>
+                <div class="no-friends" id="noFriends">
+                    <p>😢 У тебя пока нет друзей</p>
+                    <p>Поделись ссылкой и получай бонусы!</p>
+                </div>
+            </div>
+
+            <button class="back-btn" onclick="showPage('home')">← НАЗАД</button>
         </div>
 
         <!-- ПРОФИЛЬ -->

@@ -24,24 +24,10 @@ let critChance = Number(localStorage.getItem(STORAGE_KEY + 'critChance')) || 0;
 let lastDaily = Number(localStorage.getItem(STORAGE_KEY + 'lastDaily')) || 0;
 let lastWheel = Number(localStorage.getItem(STORAGE_KEY + 'lastWheel')) || 0;
 
-// ===== ЗАДАНИЯ =====
-let quests = [
-    { id: 0, name: '💰 Заработай 50 монет', reward: 20, progress: 0, target: 50, claimed: false },
-    { id: 1, name: '💰 Заработай 100 монет', reward: 50, progress: 0, target: 100, claimed: false },
-    { id: 2, name: '💰 Заработай 500 монет', reward: 200, progress: 0, target: 500, claimed: false },
-    { id: 3, name: '👆 Сделай 100 тапов', reward: 30, progress: 0, target: 100, claimed: false },
-    { id: 4, name: '👆 Сделай 500 тапов', reward: 100, progress: 0, target: 500, claimed: false },
-    { id: 5, name: '👆 Сделай 2000 тапов', reward: 300, progress: 0, target: 2000, claimed: false },
-    { id: 6, name: '🔒 Купи базовый VPN', reward: 100, progress: 0, target: 1, claimed: false },
-    { id: 7, name: '🔒 Купи PRO VPN', reward: 200, progress: 0, target: 1, claimed: false },
-    { id: 8, name: '⚡ Улучши силу тапа 5 раз', reward: 150, progress: 0, target: 5, claimed: false },
-    { id: 9, name: '🔋 Улучши энергию 5 раз', reward: 150, progress: 0, target: 5, claimed: false }
-];
-
-let savedQuests = localStorage.getItem(STORAGE_KEY + 'quests');
-if (savedQuests) {
-    quests = JSON.parse(savedQuests);
-}
+// ===== РЕФЕРАЛЫ =====
+let referrals = JSON.parse(localStorage.getItem(STORAGE_KEY + 'referrals')) || [];
+let referralCode = localStorage.getItem(STORAGE_KEY + 'referralCode') || generateReferralCode();
+let referralBonus = Number(localStorage.getItem(STORAGE_KEY + 'referralBonus')) || 0;
 
 // ===== Telegram данные =====
 let user = tg.initDataUnsafe?.user;
@@ -52,6 +38,9 @@ if (!nickname) {
     nickname = telegramName;
     localStorage.setItem(STORAGE_KEY + 'nickname', nickname);
 }
+
+// Сохраняем реферальный код
+localStorage.setItem(STORAGE_KEY + 'referralCode', referralCode);
 
 // ===== DOM ЭЛЕМЕНТЫ =====
 const coinBalance = document.getElementById('coinBalance');
@@ -68,8 +57,6 @@ const profileId = document.getElementById('profileId');
 const profileCoins = document.getElementById('profileCoins');
 const profileTaps = document.getElementById('profileTaps');
 const profilePower = document.getElementById('profilePower');
-const questsList = document.getElementById('questsList');
-const questBadge = document.getElementById('questBadge');
 const nicknameInput = document.getElementById('nicknameInput');
 const toast = document.getElementById('toast');
 const sideMenu = document.getElementById('sideMenu');
@@ -77,8 +64,6 @@ const menuOverlay = document.getElementById('menuOverlay');
 const nicknameModal = document.getElementById('nicknameModal');
 const headerNickname = document.getElementById('headerNickname');
 const headerAvatar = document.getElementById('headerAvatar');
-const wheelPreviewBtn = document.getElementById('wheelPreviewBtn');
-const wheelTimerPreview = document.getElementById('wheelTimerPreview');
 
 // Элементы улучшений
 const tapLevelEl = document.getElementById('tapLevel');
@@ -96,7 +81,7 @@ const wheelStatus = document.getElementById('wheelStatus');
 const wheelTimer = document.getElementById('wheelTimer');
 const wheelBtn = document.getElementById('wheelBtn');
 const wheel = document.getElementById('wheel');
-const shopBadge = document.getElementById('shopBadge');
+const wheelTimerPreview = document.getElementById('wheelTimerPreview');
 
 // Элементы настроек
 const themeToggle = document.getElementById('themeToggle');
@@ -136,22 +121,123 @@ function saveSetting(key, value) {
     localStorage.setItem(STORAGE_KEY + key, value);
 }
 
+// ===== ГЕНЕРАЦИЯ РЕФЕРАЛЬНОГО КОДА =====
+function generateReferralCode() {
+    let code = 'REF' + Math.random().toString(36).substring(2, 8).toUpperCase();
+    localStorage.setItem(STORAGE_KEY + 'referralCode', code);
+    return code;
+}
+
+// ===== ФУНКЦИИ ДЛЯ РЕФЕРАЛОВ =====
+function updateReferralsUI() {
+    document.getElementById('referralCount').innerText = referrals.length;
+    document.getElementById('referralBonus').innerText = referralBonus;
+
+    let badge = document.getElementById('friendsBadge');
+    if (badge) {
+        if (referrals.length > 0) {
+            badge.innerText = referrals.length;
+            badge.style.display = 'flex';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+
+    let botUsername = 'VpnontheFreeBot';
+    let link = `https://t.me/${botUsername}?start=${referralCode}`;
+    document.getElementById('referralLink').value = link;
+
+    let friendsList = document.getElementById('friendsList');
+    let noFriends = document.getElementById('noFriends');
+
+    if (referrals.length === 0) {
+        friendsList.style.display = 'none';
+        noFriends.style.display = 'block';
+    } else {
+        friendsList.style.display = 'flex';
+        noFriends.style.display = 'none';
+
+        let html = '';
+        referrals.forEach((friend, index) => {
+            let statusClass = friend.online ? 'online' : 'offline';
+            let statusText = friend.online ? '🟢 Онлайн' : '⚫ Офлайн';
+            let date = new Date(friend.date).toLocaleDateString();
+
+            html += `
+                <div class="friend-item">
+                    <div class="friend-avatar">${friend.name.charAt(0).toUpperCase()}</div>
+                    <div class="friend-info">
+                        <div class="friend-name">${friend.name}</div>
+                        <div class="friend-date">${date}</div>
+                    </div>
+                    <div class="friend-status ${statusClass}">${statusText}</div>
+                </div>
+            `;
+        });
+        friendsList.innerHTML = html;
+    }
+}
+
+function copyReferralLink() {
+    let link = document.getElementById('referralLink');
+    link.select();
+    navigator.clipboard.writeText(link.value);
+    showToast('✅ Ссылка скопирована!');
+}
+
+function addTestFriend() {
+    let names = ['Алексей', 'Мария', 'Дмитрий', 'Елена', 'Сергей', 'Анна'];
+    let randomName = names[Math.floor(Math.random() * names.length)];
+    let randomOnline = Math.random() > 0.5;
+
+    let newFriend = {
+        id: 'friend_' + Date.now(),
+        name: randomName,
+        date: new Date().toISOString(),
+        online: randomOnline
+    };
+
+    referrals.push(newFriend);
+    referralBonus += 50;
+
+    localStorage.setItem(STORAGE_KEY + 'referrals', JSON.stringify(referrals));
+    localStorage.setItem(STORAGE_KEY + 'referralBonus', referralBonus);
+
+    updateReferralsUI();
+    showToast('🎉 +50 монет за друга!');
+}
+
+function checkReferral() {
+    let startParam = tg.initDataUnsafe?.start_param;
+    if (startParam && startParam.startsWith('REF')) {
+        let referrerCode = startParam;
+        console.log('Пришел по рефералу от:', referrerCode);
+
+        tg.sendData(JSON.stringify({
+            action: 'referral',
+            code: referrerCode,
+            userId: userId,
+            nickname: nickname
+        }));
+
+        showToast('🎉 Ты пришел по ссылке друга!');
+    }
+}
+
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 function init() {
     loadSettings();
     applyTheme();
     updateUI();
-    updateQuests();
-    updateQuestBadge();
-    updateUpgradesUI();
+    updateReferralsUI();
+    checkReferral();
     updateTimers();
     setInterval(regenEnergy, 1000);
     setInterval(updateTimers, 1000);
 
-    // Показать модалку ника при первом входе
     if (!localStorage.getItem(STORAGE_KEY + 'nickname')) {
         setTimeout(() => {
-            showFirstNicknameModal();
+            showNicknameModal();
         }, 500);
     }
 }
@@ -174,7 +260,6 @@ function updateUI() {
     profileTaps.innerText = totalTaps;
     profilePower.innerText = (tapPower * 0.01).toFixed(2);
 
-    // Обновление ника в шапке
     if (headerNickname) headerNickname.innerText = nickname;
     if (headerAvatar) headerAvatar.innerText = avatarChar;
 
@@ -218,7 +303,6 @@ function handleTap() {
     tapCounter.style.animation = 'floatUp 0.8s ease-out';
 
     updateUI();
-    checkQuests();
 }
 
 // ===== УЛУЧШЕНИЯ =====
@@ -283,102 +367,11 @@ function buyRegenUpgrade() {
     showToast('🔄 +1 энергии/сек');
 }
 
-// ===== ЗАДАНИЯ =====
-function updateQuests() {
-    if (!questsList) return;
-
-    let html = '';
-    quests.forEach(quest => {
-        let progressPercent = (quest.progress / quest.target * 100) + '%';
-
-        html += `
-            <div class="quest-card">
-                <div class="quest-icon">${quest.id < 3 ? '💰' : quest.id < 6 ? '👆' : '🔒'}</div>
-                <div class="quest-info">
-                    <div class="quest-name">${quest.name}</div>
-                    <div class="quest-progress">
-                        <div class="quest-progress-fill" style="width: ${progressPercent}"></div>
-                    </div>
-                    <div class="quest-reward">🎁 ${quest.reward} монет</div>
-                </div>
-                ${quest.progress >= quest.target && !quest.claimed ?
-                    '<button class="quest-btn" onclick="claimQuest(' + quest.id + ')">ЗАБРАТЬ</button>' :
-                    quest.claimed ? '<button class="quest-btn completed" disabled>✅ ВЫПОЛНЕНО</button>' :
-                    '<button class="quest-btn disabled" disabled>' + quest.progress + '/' + quest.target + '</button>'}
-            </div>
-        `;
-    });
-    questsList.innerHTML = html;
-}
-
-function checkQuests() {
-    quests.forEach(quest => {
-        if (!quest.claimed) {
-            if (quest.id < 3) {
-                if (coins >= quest.target) {
-                    quest.progress = quest.target;
-                } else {
-                    quest.progress = coins;
-                }
-            } else if (quest.id < 6) {
-                if (totalTaps >= quest.target) {
-                    quest.progress = quest.target;
-                } else {
-                    quest.progress = totalTaps;
-                }
-            } else if (quest.id === 8) {
-                if (tapLevel >= quest.target) {
-                    quest.progress = quest.target;
-                } else {
-                    quest.progress = tapLevel;
-                }
-            } else if (quest.id === 9) {
-                if (energyLevel >= quest.target) {
-                    quest.progress = quest.target;
-                } else {
-                    quest.progress = energyLevel;
-                }
-            }
-
-            if (quest.progress >= quest.target) {
-                quest.completed = true;
-            }
-        }
-    });
-
-    localStorage.setItem(STORAGE_KEY + 'quests', JSON.stringify(quests));
-    updateQuests();
-    updateQuestBadge();
-}
-
-function updateQuestBadge() {
-    let available = quests.filter(q => q.progress >= q.target && !q.claimed).length;
-    if (questBadge) {
-        questBadge.style.display = available > 0 ? 'flex' : 'none';
-        questBadge.innerText = available;
-    }
-}
-
-function claimQuest(id) {
-    let quest = quests.find(q => q.id === id);
-    if (!quest || quest.progress < quest.target || quest.claimed) return;
-
-    coins += quest.reward;
-    quest.claimed = true;
-
-    localStorage.setItem(STORAGE_KEY + 'quests', JSON.stringify(quests));
-    updateQuests();
-    updateQuestBadge();
-    updateUI();
-    showToast('🎁 +' + quest.reward + ' монет!');
-}
-
 // ===== ЕЖЕДНЕВНАЯ НАГРАДА =====
 function updateTimers() {
     let now = Date.now();
     let dayMs = 24 * 60 * 60 * 1000;
 
-    // Daily
     if (now - lastDaily > dayMs) {
         if (dailyStatus) dailyStatus.innerText = '🎁 Доступно!';
         if (dailyBtn) dailyBtn.classList.remove('disabled');
@@ -390,7 +383,6 @@ function updateTimers() {
         if (dailyBtn) dailyBtn.classList.add('disabled');
     }
 
-    // Wheel
     if (now - lastWheel > dayMs) {
         if (wheelStatus) wheelStatus.innerText = '🎰 Доступно!';
         if (wheelBtn) wheelBtn.classList.remove('disabled');
@@ -501,14 +493,8 @@ function buyVPN(plan) {
         price: price
     }));
 
-    quests.forEach(q => {
-        if (q.id === 6 && plan === 'basic') q.progress = 1;
-        if (q.id === 7 && plan === 'pro') q.progress = 1;
-    });
-
     showToast('✅ Ключ отправлен в бота!');
     updateUI();
-    checkQuests();
 }
 
 // ===== РЕГЕНЕРАЦИЯ ЭНЕРГИИ =====
@@ -545,7 +531,6 @@ function changeNickname() {
         return;
     }
 
-    // Если это не первый вход (есть старый ник) - списываем монеты
     if (localStorage.getItem(STORAGE_KEY + 'nickname')) {
         coins -= 100;
     }
@@ -574,14 +559,14 @@ function showPage(pageId) {
     document.getElementById('page' + pageId.charAt(0).toUpperCase() + pageId.slice(1)).classList.add('active');
     toggleMenu();
 
-    if (pageId === 'quests') {
-        updateQuests();
-    }
     if (pageId === 'upgrades') {
         updateUpgradesUI();
     }
     if (pageId === 'shop') {
         updateTimers();
+    }
+    if (pageId === 'referrals') {
+        updateReferralsUI();
     }
 }
 
@@ -601,7 +586,6 @@ window.buyTapUpgrade = buyTapUpgrade;
 window.buyEnergyUpgrade = buyEnergyUpgrade;
 window.buyRegenUpgrade = buyRegenUpgrade;
 window.buyVPN = buyVPN;
-window.claimQuest = claimQuest;
 window.claimDailyReward = claimDailyReward;
 window.spinWheel = spinWheel;
 window.toggleMenu = toggleMenu;
@@ -611,3 +595,5 @@ window.closeModal = closeModal;
 window.changeNickname = changeNickname;
 window.toggleTheme = toggleTheme;
 window.saveSetting = saveSetting;
+window.copyReferralLink = copyReferralLink;
+window.addTestFriend = addTestFriend;
