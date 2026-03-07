@@ -2,6 +2,13 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 :root {
@@ -745,6 +752,7 @@ body.dark-theme {
     display: flex;
     justify-content: center;
     margin: 15px 0;
+    position: relative;
 }
 
 .wheel {
@@ -785,16 +793,18 @@ body.dark-theme {
     transform: rotate(calc(45deg * var(--i)));
 }
 
-.wheel-segment::before {
-    content: '';
+.wheel-pointer {
     position: absolute;
-    width: 2px;
-    height: 50%;
-    background: rgba(255,255,255,0.5);
+    top: -15px;
     left: 50%;
-    top: 0;
-    transform-origin: bottom;
-    transform: rotate(calc(45deg * var(--i) - 22.5deg));
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 30px solid var(--secondary);
+    z-index: 10;
+    filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));
 }
 
 .wheel-prizes {
@@ -833,47 +843,49 @@ body.dark-theme {
 
 .wheel-controls {
     display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.wheel-timer-info {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 12px;
+    display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 12px;
-    margin-top: 10px;
 }
 
-.wheel-info {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+.wheel-timer-text {
+    font-size: 14px;
+    color: var(--text-dim);
 }
 
-.wheel-info span:first-child {
+.wheel-timer-value {
+    font-size: 14px;
     font-weight: 600;
     color: var(--primary);
 }
 
-.wheel-info span:last-child {
-    font-size: 12px;
-    color: var(--text-dim);
-}
-
-.wheel-btn {
+.wheel-spin-btn {
     background: var(--primary);
     color: var(--bg-dark);
     border: none;
-    padding: 8px 16px;
+    padding: 16px;
     border-radius: 30px;
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 16px;
     cursor: pointer;
     transition: all 0.2s;
-    min-width: 100px;
 }
 
-.wheel-btn:active {
+.wheel-spin-btn:active {
     transform: scale(0.96);
 }
 
-.wheel-btn.disabled {
+.wheel-spin-btn.disabled {
     opacity: 0.5;
     pointer-events: none;
 }
@@ -1353,7 +1365,7 @@ input:checked + .slider:before {
     color: var(--text);
 }
 
-/* ===== ТОСТЫ (УВЕДОМЛЕНИЯ) ===== */
+/* ===== ТОСТЫ ===== */
 .toast {
     position: fixed;
     bottom: 30px;

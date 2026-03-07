@@ -226,6 +226,7 @@
 
             <div class="wheel-page">
                 <div class="wheel-container">
+                    <div class="wheel-pointer"></div>
                     <div class="wheel" id="wheel">
                         <div class="wheel-segment" style="--i:0">5</div>
                         <div class="wheel-segment" style="--i:1">10</div>
@@ -253,11 +254,11 @@
                 </div>
 
                 <div class="wheel-controls">
-                    <div class="wheel-info">
-                        <span id="wheelStatus">Доступно!</span>
-                        <span id="wheelTimer"></span>
+                    <div class="wheel-timer-info">
+                        <span class="wheel-timer-text">Следующий бесплатный:</span>
+                        <span class="wheel-timer-value" id="wheelTimer"></span>
                     </div>
-                    <button class="wheel-btn" onclick="spinWheel()" id="wheelBtn">КРУТИТЬ</button>
+                    <button class="wheel-spin-btn" onclick="spinWheel()" id="wheelBtn">КРУТИТЬ 5 🪙</button>
                 </div>
             </div>
             <button class="back-btn" onclick="showPage('shop')">← В МАГАЗИН</button>
